@@ -1,0 +1,38 @@
+Sub RowCount(pRowTable)
+
+    Let RC.Rows = Num(NoOfRows('$(pRowTable)'),'#,##0');
+
+    Trace ---------------- $(pRowTable): $(RC.Rows) rows;
+
+    RC.Rows=;
+
+End Sub;
+
+
+Fact:
+Load
+    Rand() as Random
+AutoGenerate
+    (1000);
+
+
+Temp:
+Load
+    Chr(IterNo()) as Char
+AutoGenerate
+    (1)
+While
+    IterNo() <= 2;
+
+
+Outer Join(Fact)
+Load
+    Char
+Resident
+    Temp;
+
+
+Drop Table Temp;
+
+
+CALL RowCount('Fact');
