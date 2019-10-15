@@ -1,0 +1,36 @@
+// Create empty table and setting field types
+Log:
+Load
+    Null()                     as [Log.Table],
+    Num(Null(),'#,##0')        as [Log.Rows],
+    Timestamp(Null())          as [Log.Timestamp]
+AutoGenerate
+    (0);
+    
+​
+Fact:
+LOAD
+    TransLineID,
+    TransID,
+    "Num",
+    Dim1,
+    Dim2,
+    Dim3,
+    Expression1,
+    Expression2,
+    Expression3
+FROM
+    [lib://QVD/SampleTransactions.qvd](qvd);
+​
+​
+// Add Log record
+Concatenate(Log)
+Load
+    'Fact'                    as [Log.Table],
+    NoOfRows('Fact')          as [Log.Rows],
+    Now()                     as [Log.Timestamp]
+AutoGenerate
+    (1);
+    
+    
+    
