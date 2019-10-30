@@ -1,0 +1,18 @@
+
+SET fWeekDiff = '(((Year($2)*52)+Week($2))) - (((Year($1)*52)+Week($1)))';
+
+Data:
+Load
+	StartDate,
+    EndDate,
+    $(fWeekDiff(StartDate,EndDate)) as NoOfWeeks
+;
+Load 
+    Date#(StartDate,'M/D/YYYY') 	as StartDate,
+    Date#(EndDate,'M/D/YYYY') 		as EndDate
+Inline [
+StartDate, EndDate
+1/3/2017, 2/14/2017
+2/14/2017, 6/1/2017
+6/1/2017, 8/14/2017
+];
