@@ -1,0 +1,29 @@
+Fix:
+Load * Inline [
+ID, DIM, SALES
+1, A, 100
+2, A, 50
+3, B, 75
+3, B, 75
+4, C, 1000
+];
+
+
+
+tmp:
+LOAD Distinct * Inline [
+DIM, DESC
+A, Big Fish
+B, Reoccuring
+B, Reoccuring
+C, High Roller
+];
+
+
+Left Join(Fix)
+Load
+   *
+Resident
+    tmp;
+
+Drop Table tmp;
