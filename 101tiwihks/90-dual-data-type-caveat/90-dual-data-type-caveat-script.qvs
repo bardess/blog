@@ -1,0 +1,15 @@
+Data:
+Load 
+	  RowNo() as Id,
+    Text(String) as String,
+	  Num(Number) as Number,
+    Dual(String,Number) as Dual
+Inline [
+    String, Number
+    A, 1
+    B, 2
+    C, 3
+    A, 4
+    Z, 1
+]; 
+
