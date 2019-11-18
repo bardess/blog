@@ -1,0 +1,48 @@
+status_map:
+Mapping Load * Inline [
+input, output
+1, one
+2, two 
+3, three
+];
+
+
+Raw:
+Load
+    'A' as dim,
+    1 as num
+AutoGenerate    
+    (1);
+
+
+Concatenate(Raw)
+Load
+    'B' as dim,
+    Null() as num
+AutoGenerate
+    (1);
+    
+
+Concatenate(Raw)
+Load
+    'C' as dim,
+    3 as num
+AutoGenerate
+    (1);
+
+
+NullAsValue num;
+NullValue = 2;
+
+
+Check:
+NoConcatenate Load
+    dim,
+    ApplyMap('status_map',num) as num
+resident
+    Raw;
+
+
+Drop table Raw;
+
+Exit script;
