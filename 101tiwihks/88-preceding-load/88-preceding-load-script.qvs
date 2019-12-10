@@ -1,0 +1,33 @@
+Original:
+Load
+	Pick(Floor((Rand()*10)/2)+1,'A','B','C','D','E') 	as Customer,
+	'Q'&(Mod(RowNo(), 4)+1) 							as Quarter,
+    Ceil((Rand() * 100) * (Rand()*10)) 					as Sales
+AutoGenerate
+	(100);
+    
+    
+    
+New:
+Load	
+	CustomerName,
+    Quarter,
+    TotalSales,
+    If(Customer = Previous(Customer), 
+    	TotalSales - Previous(TotalSales), 0) as QoQChange
+;
+Load
+	Customer as CustomerName,
+    Quarter,
+    Sum(Sales) as TotalSales
+Resident
+	Original
+Group By
+	Customer,
+    Quarter
+Order by
+	Customer,
+    Quarter;
+
+
+Drop Table Original;
