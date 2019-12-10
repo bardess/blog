@@ -1,0 +1,19 @@
+Data:
+Load
+	'Test' as DATA_NAME,
+    Rand() as RANDOM_NUMBER
+AutoGenerate
+	(100);
+    
+
+FieldName_map:
+Mapping Load
+	FieldName(IterNo(),'Data') as OldName,
+    Capitalize(Replace(FieldName(IterNo(),'Data'),'_',' ')) as NewName  
+AutoGenerate
+	(1)
+While
+	IterNo() < NoOfFields('Data')+1;
+    
+    
+Rename Fields Using FieldName_map;
