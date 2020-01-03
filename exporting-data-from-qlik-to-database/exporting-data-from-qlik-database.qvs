@@ -1,0 +1,97 @@
+//	**************************************************************************************************************
+//	**
+//	**	Subroutine 
+//	**
+//	**************************************************************************************************************
+
+Sub ConvertToSQLValues(pTable,pBatchSize)
+
+    For ctsv.f=0 to NoOfFields('$(pTable)')
+
+        [ctsv.Field_tmp]:
+        Load
+            FieldName($(ctsv.f),'$(pTable)') as [ctsv.FieldName]
+        AutoGenerate
+            (1);
+
+    Next ctsv.f;
+
+
+
+    [ctsv.ConcatScript]:
+    Load
+    	'SQL INSERT INTO $(pTable) (' & Concat([ctsv.FieldName],','&chr(10)) & ')' 						as [ctsv.InsertClause],
+        'Chr(39) & ' & Concat([ctsv.FieldName],' & chr(39) & Chr(44) & chr(39) & ') & ' & Chr(39)' 		as [ctsv.ValueConcat]
+    Resident
+        ctsv.Field_tmp;
+
+
+    Let ctsv.vInsertClause = Peek('ctsv.InsertClause', 0, 'ctsv.ConcatScript');
+    Let ctsv.vValueConcat = Peek('ctsv.ValueConcat', 0, 'ctsv.ConcatScript');
+
+
+	Drop Tables [ctsv.Field_tmp],[ctsv.ConcatScript];
+
+
+    [$(pTable).SQLValues]:
+    Load   	
+    	'$(ctsv.vInsertClause)' 												as [$(pTable).Insert],
+    	[$(pTable).BatchId]														as [$(pTable).BatchId],
+        Concat([$(pTable).Values],','&Chr(10)) 											as [$(pTable).Values],
+        Concat( [$(pTable).ValueString],','&Chr(10))	as [$(pTable).ValueString]
+    Group by
+    	[$(pTable).BatchId];
+    Load
+    	Ceil((RecNo()/$(pBatchSize)))											as [$(pTable).BatchId],
+        Replace('('&$(ctsv.vValueConcat)&')', Chr(39)&Chr(39), 'NULL') 	as [$(pTable).Values],
+        '$(ctsv.vValueConcat)' as [$(pTable).ValueString]
+    Resident
+        [$(pTable)];
+
+
+	ctsv.f=;ctsv.vInsertClause=;ctsv.vValueConcat=;
+   
+   
+End Sub;
+
+
+//	**************************************************************************************************************
+//	**
+//	**	Execute 
+//	**
+//	**************************************************************************************************************
+
+Let vDBConnection = '%Database Connection Name%';
+Let vLB = chr(10); // Line Break
+
+For t = 0 to NoOfTables() - 1
+
+	Let vTable = TableName($(t));
+    
+    
+    Call ConvertToSQLValues('$(vTable)',500);
+    
+	
+    For i = 0 to NoOfRows('$(vTable).SQLValues')-1
+    
+    	
+        Let vSQL = 'Lib Connect To '& chr(39) & '$(vDBConnection)' &chr(39) &'; $(vLB)$(vLB)' &
+        			Peek('$(vTable).Insert',$(i),'$(vTable).SQLValues') & '$(vLB)' &
+        			'Values $(vLB)' & Peek('$(vTable).Values',$(i),'$(vTable).SQLValues') &
+                    '$(vLB)$(vLB)!EXECUTE_NON_SELECT_QUERY;$(vLB)$(vLB)Disconnect;$(vLB)$(vLB)';
+    
+	
+    $(vSQL)
+    
+    
+    Drop Tables [$(vTable).SQLValues];
+    
+    vSQL=;
+    
+    Next i;
+    
+    i=;
+    
+Next t;
+
+t=;
