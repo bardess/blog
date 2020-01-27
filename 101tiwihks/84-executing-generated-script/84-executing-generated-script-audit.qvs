@@ -1,0 +1,63 @@
+
+Audit:
+Load
+    Text(Null()) as Query
+AutoGenerate
+    (0);
+
+
+for each file in FileList('lib://QlikShare/audit/queries/*.sql')
+
+    Concatenate(Audit)
+    Load
+        
+        Subfield(FileBaseName(),'.',2)	as AuditName,
+        "@1:n" 							as Query
+    From
+        [$(file)](fix, utf8, record is 10000 lines);
+
+Next file;
+
+
+AuditRecords:
+NoConcatenate Load
+	Text(Null()) as AuditName
+AutoGenerate
+	(0);
+    
+    
+For q = 0 to NoOfRows('Audit')-1
+
+	Let vQuery = Peek('Query',$(q),'Audit');
+    Let vAuditName = Peek('AuditName',$(q),'Audit');
+    
+    tmp:
+    $(vQuery);
+    
+    
+    Concatenate(AuditRecords)
+    Load
+    	'$(vAuditName)' as AuditName,
+        NoOfRows('tmp') as AuditRecords
+    AutoGenerate
+    	(1);
+        
+        
+    Store tmp into [lib://QlikShare/audit/results/$(vAuditName).csv](txt);
+    
+    Drop Table tmp;
+    
+Next q;
+
+
+Left Join(Audit)
+Load
+	AuditName,
+    AuditRecords
+Resident
+	AuditRecords;
+    
+    
+Drop Table AuditRecords;
+
+
