@@ -1,0 +1,114 @@
+//	******************************************************************************
+//  **
+//  **    Extract Queue
+//  **
+//	******************************************************************************
+
+//	******************************************************************************
+//  **    Config
+//	******************************************************************************
+
+Let vReloadTime = Num(Now());
+Set ErrorMode = 0;
+
+
+//	******************************************************************************
+//  **    Sub
+//	******************************************************************************
+
+Sub FileCheck
+
+    ExtractPeriod:
+    Load
+        Null() as EXTRACTED_PERIOD
+    AutoGenerate    
+        (0);
+
+    Let vDate = Date(Today(),'YYYYMMDD');
+
+
+    For each file in filelist('Lib://QVD/V_FACT_GL_*.qvd');
+
+        Let vP = Replace(Upper(Subfield('$(file)','_',-1)),'.QVD','');
+
+        Let vFileTime = Num(FileTime('$(file)'));
+
+        If vFileTime > vReloadTime Then
+
+            Concatenate(ExtractPeriod)
+            Load Distinct
+                $(vP) as EXTRACTED_PERIOD
+            AutoGenerate
+                (1);
+
+        End If;
+
+    Next file;
+
+End Sub;
+
+
+//	******************************************************************************
+//  **    Set Up
+//	******************************************************************************
+
+Periods:
+Load Distinct
+    Year(Date_tmp)&Num(Month(Date_tmp),'00') as PERIOD;
+Load
+    MakeDate(2017)+(iterNo()-1) as Date_tmp
+AutoGenerate
+    (1)
+While
+    MakeDate(2017)+(iterNo()-1) <= Today();
+
+Call FileCheck;
+
+Queue:
+Load
+    PERIOD as NEXT_PERIOD
+Resident    
+    PERIOD
+Where
+    Not Exists(EXTRACTED_PERIOD, PERIOD);
+
+
+//	******************************************************************************
+//  **    Execute
+//	******************************************************************************
+
+Do While NoOfRows('Queue') > 0
+
+    Let vPERIOD = Peek('NEXT_PERIOD',$(p),'Queue');
+    
+    Trace --------------------------------- Querying Period: $(vPERIOD);
+    
+    LIB CONNECT TO 'DATABASE';
+    
+    V_FACT_GL:
+    SQL
+    SELECT * FROM "DB"."V_FACT_GL" WHERE PERIOD = '$(vPERIOD)';
+    
+    Disconnect;
+    
+    Store V_FACT_GL into [Lib://QVD/V_FACT_GL_$(vPERIOD).qvd](qvd);
+    
+    Drop Table V_FACT_GL;
+    
+    
+    Drop Tables ExtractPeriod, Queue;
+    
+    Call FileCheck;
+    
+    Queue:
+    Load
+        PERIOD as NEXT_PERIOD
+    Resident    
+        PERIOD
+    Where
+        Not Exists(PERIOD, EXTRACTED_PERIOD);
+
+Loop
+
+
+exit script;
