@@ -1,0 +1,17 @@
+String_map:
+Mapping Load * Inline [
+input, output
+1, One
+2, Two 
+3, Three
+];
+
+
+Data:
+Load
+	RowNo() as Num,
+    ApplyMap('String_map',RowNo(),'N/A') as String
+AutoGenerate
+	(4);
+    
+   
