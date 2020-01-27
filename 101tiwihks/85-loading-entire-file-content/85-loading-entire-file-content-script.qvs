@@ -1,0 +1,28 @@
+Test:
+Load
+    "@1:n" as Source
+FROM
+    [lib://data/readme.md](fix, utf8, record is 10000 lines);
+
+
+
+HTML:
+Load
+    Num(Null()) 										as Counter
+AutoGenerate
+    (0);
+
+
+For each file in FileList('lib://QlikShare/Dev/data/html/*.html')
+
+    Concatenate(HTML)
+    Load
+        'Test Case '&Subfield(FileBaseName(),'.',1) 	as Id,
+        Subfield(FileBaseName(),'.',2) 					as Name,
+        "@1:n" 											as Example,
+        Ceil(Subfield(FileBaseName(),'.',1)/3) 			as WowFactor,
+        1 												as Counter
+    From
+        [$(file)](fix, utf8, record is 10000 lines);
+
+Next file;
