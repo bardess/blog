@@ -1,0 +1,14 @@
+
+Answer:
+Load * Inline [
+Answer
+Yes
+No
+Maybe
+];
+
+
+Let vAnswer = 'Trace Should You do it? ' & Upper(Peek('Answer',Floor(Rand()*3),'Answer')) &'! ;';
+
+$(vAnswer)
+
