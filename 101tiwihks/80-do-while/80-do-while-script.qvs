@@ -1,0 +1,18 @@
+// Determine numerical value of a second
+Let vSecond = Num(Time#('00:00:01','hh:mm:ss') - Time#('00:00:00','hh:mm:ss'));
+
+
+Let vEnd = Num(Now()) + ($(vSecond)*5);
+
+
+Set vIter = 0;
+
+
+Do While Num(Now()) < $(vEnd)
+
+
+    Trace --------------------------- Iteration $(vIter);
+    Let vIter = Num(vIter + 1,'#,##0');
+
+
+Loop;
