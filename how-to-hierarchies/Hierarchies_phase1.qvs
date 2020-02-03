@@ -1,0 +1,83 @@
+
+
+[Owner Ancestry Table temp]:
+//ownersbridge:
+HierarchyBelongsTo (owner_NodeID, owner_AncestorID, owner_NodeName, owner_AncestorID, owner_AncestorName) 
+LOAD
+    owner_id 								as owner_NodeID,
+    owner_name 								as owner_NodeName,
+    owner_parent_id 						as owner_AncestorID
+FROM [lib://Data/owners.qvd]
+(qvd);
+
+
+drop fields owner_AncestorID, owner_NodeName;
+
+[Location Ancestry Table temp]:
+//locationsbridge:
+HierarchyBelongsTo (location_NodeID, location_AncestorID, location_NodeName,location_AncestorID,location_AncestorName) 
+LOAD
+    location_id 							as location_NodeID,
+    parent_id 								as location_AncestorID,
+    location_name 							as location_NodeName
+FROM [lib://Data/locations.qvd]
+(qvd);
+drop fields location_AncestorID, location_NodeName;
+
+
+// Use Hierarchy() to create Hierarchy Table.
+[Owner Hierarchy Table]:
+Hierarchy(owner_NodeID, owner_AncestorID, owner_NodeName, owner_ParentName, owner_NodeName)
+Load 
+	owner_id,
+	owner_id 								as owner_NodeID, 
+	owner_parent_id 						as owner_AncestorID, 
+	owner_name 								as owner_NodeName
+FROM [lib://Data/owners.qvd]
+(qvd);
+//Hierarchy() to create Hierarchy Table.
+[Location Hierarchy Table]:
+Hierarchy(location_NodeID, location_AncestorID, location_NodeName, location_ParentName, location_NodeName)
+Load 
+    location_id, 
+    location_id 							as location_NodeID,				
+    parent_id 								as location_AncestorID,
+    location_name 							as location_NodeName
+FROM [lib://Data/locations.qvd]
+(qvd);
+
+drop fields Path;
+
+rename fields 
+owner_NodeName1 to Owner1, 
+owner_NodeName2 to Owner2, 
+owner_NodeName3 to Owner3, 
+owner_NodeName4 to Owner4;
+rename fields 
+location_NodeName1 to World, 
+location_NodeName2 to Continent, 
+location_NodeName3 to Country, 
+location_NodeName4 to "State/Province", 
+location_NodeName5 to City, 
+location_NodeName6 to Region,
+location_NodeName7 to District
+;
+
+
+
+wineries:
+LOAD
+    location_id,
+    owner_id,
+    winery_count as winery_count_goal
+FROM [lib://Data/goal.qvd]
+(qvd);
+
+Concatenate(wineries)
+LOAD
+    location_id,
+    owner_id,
+    winery_count
+FROM [lib://Data/wineries.qvd]
+(qvd)
+;
