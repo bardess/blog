@@ -18,8 +18,8 @@ FROM [lib://Data/goal.qvd]
 
 Left Join(location_target)
 Load
-	location_ancestor_id								as location_target,
-	location 											as location_descendant
+	location_ancestor_id									as location_target,
+	location 										as location_descendant
 Resident location_ancestor;
 
 location_rollup_map:
@@ -36,7 +36,7 @@ drop table location_target;
 Ancestor:
 HierarchyBelongsTo(owner_id, owner_parent_id,owner, owner_ancestor_id, owner_ANCESTOR_NAME)
 LOAD
-	owner_id			 								as owner,
+	owner_id			 							as owner,
 	owner_id,
 	owner_parent_id
 FROM [lib://Data/owners.qvd](qvd);
@@ -45,14 +45,14 @@ Drop Fields owner_id, owner_ANCESTOR_NAME;
 
 Target:
 LOAD Distinct
-	owner_id 											as owner_target
+	owner_id 										as owner_target
 FROM [lib://Data/goal.qvd]
 (qvd);
 
 Left Join(Target)
 Load
 	owner_ancestor_id									as owner_target,
-	owner 												as owner_DESCENDANT
+	owner 											as owner_DESCENDANT
 Resident Ancestor;
 
 
@@ -78,16 +78,14 @@ FROM [lib://Data/goal.qvd]
 
 Concatenate(wineries)
 Load
-	winery_count,
+    winery_count,
     owner_id,
     location_id,
     ;
 LOAD
     winery_count,
-//    owner_id,
-//    location_id,
-    applymap('owner_rollup_map', owner_id) 				as owner_id,
-    applymap('location_rollup_map', location_id) 		as location_id
+    applymap('owner_rollup_map', owner_id) 							as owner_id,
+    applymap('location_rollup_map', location_id) 						as location_id
 FROM [lib://Data/wineries.qvd]
 (qvd)
 ;
@@ -100,16 +98,16 @@ FROM [lib://Data/wineries.qvd]
 Hierarchy(owner_node_id, owner_ancestor_id, owner_node_name, owner_parent_name, owner_node_name)
 Load 
 	owner_id,
-	owner_id 											as owner_node_id, 
+	owner_id 										as owner_node_id, 
 	owner_parent_id 									as owner_ancestor_id, 
-	owner_name 											as owner_node_name 
+	owner_name 										as owner_node_name 
 FROM [lib://Data/owners.qvd]
 (qvd);
 //Hierarchy() to create Hierarchy Table.
 [Location Hierarchy Table]:
 Hierarchy(location_node_id, location_ancestor_id, location_node_name, location_parent_name, location_node_name)
 Load 
-	location_id,
+    location_id,
     location_id 										as location_node_id,
     parent_id 											as location_ancestor_id,
     location_name 										as location_node_name
