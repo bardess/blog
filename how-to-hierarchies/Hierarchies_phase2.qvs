@@ -1,0 +1,135 @@
+location_ancestor:
+//locationsbridge:
+HierarchyBelongsTo (location_id, parent_id, location,location_ancestor_id,location_ancestor_name) 
+LOAD
+    location_id 										as location,
+    location_id,
+    parent_id
+FROM [lib://Data/locations.qvd]
+(qvd);
+
+Drop Fields location_id, location_ancestor_name;
+
+location_target:
+LOAD Distinct
+	location_id 										as location_target
+FROM [lib://Data/goal.qvd]
+(qvd);
+
+Left Join(location_target)
+Load
+	location_ancestor_id								as location_target,
+	location 											as location_descendant
+Resident location_ancestor;
+
+location_rollup_map:
+Mapping
+Load
+	location_descendant,
+	location_target
+Resident location_target;
+
+//drop tables location_ancestor, location_target;
+drop table location_target;
+
+
+Ancestor:
+HierarchyBelongsTo(owner_id, owner_parent_id,owner, owner_ancestor_id, owner_ANCESTOR_NAME)
+LOAD
+	owner_id			 								as owner,
+	owner_id,
+	owner_parent_id
+FROM [lib://Data/owners.qvd](qvd);
+
+Drop Fields owner_id, owner_ANCESTOR_NAME;
+
+Target:
+LOAD Distinct
+	owner_id 											as owner_target
+FROM [lib://Data/goal.qvd]
+(qvd);
+
+Left Join(Target)
+Load
+	owner_ancestor_id									as owner_target,
+	owner 												as owner_DESCENDANT
+Resident Ancestor;
+
+
+owner_rollup_map:
+Mapping
+Load
+	owner_DESCENDANT,
+	owner_target
+Resident Target;
+
+//drop tables Ancestor, Target;
+drop table Target;
+
+
+
+wineries:
+LOAD
+    location_id,
+    owner_id,
+    winery_count 										as winery_count_goal
+FROM [lib://Data/goal.qvd]
+(qvd);
+
+Concatenate(wineries)
+Load
+	winery_count,
+    owner_id,
+    location_id,
+    ;
+LOAD
+    winery_count,
+//    owner_id,
+//    location_id,
+    applymap('owner_rollup_map', owner_id) 				as owner_id,
+    applymap('location_rollup_map', location_id) 		as location_id
+FROM [lib://Data/wineries.qvd]
+(qvd)
+;
+
+
+
+
+// Use Hierarchy() to create Hierarchy Table.
+[Owner Hierarchy Table]:
+Hierarchy(owner_node_id, owner_ancestor_id, owner_node_name, owner_parent_name, owner_node_name)
+Load 
+	owner_id,
+	owner_id 											as owner_node_id, 
+	owner_parent_id 									as owner_ancestor_id, 
+	owner_name 											as owner_node_name 
+FROM [lib://Data/owners.qvd]
+(qvd);
+//Hierarchy() to create Hierarchy Table.
+[Location Hierarchy Table]:
+Hierarchy(location_node_id, location_ancestor_id, location_node_name, location_parent_name, location_node_name)
+Load 
+	location_id,
+    location_id 										as location_node_id,
+    parent_id 											as location_ancestor_id,
+    location_name 										as location_node_name
+FROM [lib://Data/locations.qvd]
+(qvd);
+
+drop field Path;
+rename fields 
+owner_node_name1 to Owner1, 
+owner_node_name2 to Owner2, 
+owner_node_name3 to Owner3, 
+owner_node_name4 to Owner4;
+rename fields 
+location_node_name1 to World, 
+location_node_name2 to Continent, 
+location_node_name3 to Country, 
+location_node_name4 to "State/Province", 
+location_node_name5 to City, 
+location_node_name6 to Region,
+location_node_name7 to District
+;
+
+
