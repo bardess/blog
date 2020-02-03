@@ -77,11 +77,6 @@ FROM [lib://Data/goal.qvd]
 (qvd);
 
 Concatenate(wineries)
-Load
-    winery_count,
-    owner_id,
-    location_id,
-    ;
 LOAD
     winery_count,
     applymap('owner_rollup_map', owner_id) 							as owner_id,
