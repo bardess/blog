@@ -6,7 +6,7 @@ HierarchyBelongsTo (owner_NodeID, owner_AncestorID, owner_NodeName, owner_Ancest
 LOAD
     owner_id 								as owner_NodeID,
     owner_name 								as owner_NodeName,
-    owner_parent_id 						as owner_AncestorID
+    owner_parent_id 							as owner_AncestorID
 FROM [lib://Data/owners.qvd]
 (qvd);
 
@@ -30,9 +30,9 @@ drop fields location_AncestorID, location_NodeName;
 Hierarchy(owner_NodeID, owner_AncestorID, owner_NodeName, owner_ParentName, owner_NodeName)
 Load 
 	owner_id,
-	owner_id 								as owner_NodeID, 
+	owner_id 							as owner_NodeID, 
 	owner_parent_id 						as owner_AncestorID, 
-	owner_name 								as owner_NodeName
+	owner_name 							as owner_NodeName
 FROM [lib://Data/owners.qvd]
 (qvd);
 //Hierarchy() to create Hierarchy Table.
@@ -69,7 +69,7 @@ wineries:
 LOAD
     location_id,
     owner_id,
-    winery_count as winery_count_goal
+    winery_count 							as winery_count_goal
 FROM [lib://Data/goal.qvd]
 (qvd);
 
