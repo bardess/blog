@@ -1,0 +1,20 @@
+
+LET HidePrefix = '%';
+
+Sales:
+Load
+	RowNo() as Id,
+    AutoNumber(Pick(Ceil(Rand()*4), 'A','B','C','D'),'Product') as %ProductId,
+    Ceil(Rand()*100) as Qty
+AutoGenerate
+	(1000);
+    
+       
+Product:
+Load
+	AutoNumber(Chr(RowNo()+64),'Product') as [%ProductId],
+    Chr(RowNo()+64) as ProductId
+AutoGenerate
+	(5);
+    
+    
