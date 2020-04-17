@@ -1,0 +1,23 @@
+
+Data:
+Load 
+	RowNo() as ID,
+    Replace(Replace(Qty,'(','['),')',']') as Qty
+Inline [
+Qty
+(10,12,15,20)
+(25,25,25,25)
+(1080,720,2,3)
+](delimiter is \t);
+
+
+Expanded:
+Load
+	RowNo() as LineID,
+	ID,
+    Qty,
+    SubField(PurgeChar(Qty,'[]'),',') as Quantity
+Resident
+	Data;
+
+Drop Table Data;
