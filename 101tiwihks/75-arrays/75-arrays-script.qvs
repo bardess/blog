@@ -1,0 +1,25 @@
+
+// Variable Array
+SET vCount = 'One','Two','Three';
+
+for each i in $(vCount)
+
+    Trace ------------ Variable Array $(i);
+
+Next i
+
+
+// Field Array
+Cnt:
+Load * Inline [
+Cnt
+One
+Two
+Three
+];
+
+For each x in FieldValueList('Cnt');
+
+    Trace ------------ Field Array: $(x);
+
+Next x;
