@@ -1,0 +1,35 @@
+// Load all QVDs in a directory
+Load
+    *
+From
+    [lib://QVD/*.qvd];
+    
+
+// Load all CSV files that match the wildcard pattern 'Sales_*.csv', which will auto-concatenate if fields are the same.
+Sales:
+Load
+    *
+From
+    [lib://Data/Sales_*.csv](txt, utf8, embedded labels, delimiter is ',');
+    
+    
+// Explicitly concatenate all files that match the wildcard pattern 'Sales_*.csv'.
+Sales:
+Load
+    Null() as Tmp
+AutoGenerate
+    (0);
+
+For each File in FileList('lib://Data/Sales_*.csv')
+
+    Concatenate(Sales)
+    Load
+        *
+    From
+        [$(File)](txt, utf8, embedded labels, delimiter is ',');
+
+Next File
+
+Drop Field Tmp;
+
+
