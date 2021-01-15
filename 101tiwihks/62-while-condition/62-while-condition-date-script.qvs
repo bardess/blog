@@ -1,0 +1,9 @@
+Let vDateField = 'Date';
+
+AllDates:
+Load
+    FieldValue('$(vDateFieldName)', IterNo()) AS EveryDate
+AutoGenerate
+    (1)
+While
+    Not IsNull(FieldValue('$(vDateField)', IterNo()));
