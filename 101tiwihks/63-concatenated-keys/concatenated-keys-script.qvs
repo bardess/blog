@@ -1,0 +1,44 @@
+Data:
+Load
+    Region&'|'&ProductId as %Region_Product,
+    Region,
+    Qty
+Inline [
+Region, ProductId, Qty
+North, A, 12
+East, B, 7
+West, C, 19
+South, A, 11
+North, B, 5
+East, C, 8
+West, D, 10
+South, C, 3
+];
+
+
+
+
+Product:
+Load
+    Region&'|'&ProductId as %Region_Product,
+    ProductId,
+    Price
+Inline [
+Region, ProductId, Price
+North, A, 5
+South, A, 7
+East, A, 5
+West, A, 6
+North, B, 13
+South, B, 15
+East, B, 8
+West, B, 9
+North, C, 1
+South, C, 1
+East, C, 1
+West, C, 1
+North, D, 21
+South, D, 15
+East, D, 12
+West, D, 7
+];
