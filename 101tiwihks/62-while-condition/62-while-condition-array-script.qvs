@@ -1,0 +1,19 @@
+Data:
+Load * Inline [
+Array
+12|13|AAA|1
+12|7|BBB|2|7Adkj
+];
+
+
+NewData:
+Load
+    SubField(Array,'|', IterNo()) as ArrayValue,
+    IterNo() as ArrayIteration
+Resident
+    Data
+While
+    IterNo() <= 3;
+
+
+Drop Table Data;
