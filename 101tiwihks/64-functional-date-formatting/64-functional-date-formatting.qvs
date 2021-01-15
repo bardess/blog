@@ -1,0 +1,23 @@
+Sales:
+Load 
+	RowNo() as Id, 
+    Num(Date) as DateNum,
+    * 
+Inline [
+Date, Amt
+10/8/2019, 100
+10/9/2019, 125
+10/10/2019, 75
+11/1/2019, 150
+11/10/2019, 200
+];
+
+
+Left Join(Sales)
+Load
+	DateNum,
+    1 as FutureFlag
+Resident
+	Sales
+Where
+	Num(DateNum) > Num(Today());
