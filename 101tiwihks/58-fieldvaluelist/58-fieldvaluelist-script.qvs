@@ -1,0 +1,37 @@
+Numbers:
+Load * Inline [
+Num
+Zero
+One
+Two
+Two
+Three
+];
+
+
+Trace --------------------- FieldValueList:;
+
+Let vIter = 0;
+
+For each n in  FieldValueList('Num')
+
+	Trace --------------------- Iteration: $(vIter) | Number: $(n);
+	
+    Let vIter = $(vIter) + 1;
+      
+Next n;
+
+vIter=;n=;
+
+
+Trace --------------------- NoOfRows + Peek:;
+
+For i = 0 to NoOfRows('Numbers')-1
+
+	Let vNum = Peek('Num',$(i),'Numbers');
+    
+    Trace --------------------- Iteration: $(i) | Number: $(vNum); 
+    
+Next i;
+
+vNum=;i=;
